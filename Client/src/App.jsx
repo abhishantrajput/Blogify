@@ -1,15 +1,13 @@
 
-
-
-import React from 'react'
+import React from "react";
+import Layout from "./layout/Layout";
 
 const App = () => {
   return (
+    <>
+    <Layout/>
+    </>
+  );
+};
 
-
-    <div>App</div>
-
-    )
-}
-
-export default App
+export default App;
