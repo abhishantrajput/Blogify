@@ -2,17 +2,23 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button, Label, TextInput, Alert, Spinner } from "flowbite-react";
-import {signInFailure,signInStart,signInSuccess} from "../redux/user/userSlice.js"
-import {useDispatch,useSelector} from "react-redux"
+import {
+  signInFailure,
+  signInStart,
+  signInSuccess,
+} from "../redux/user/userSlice.js";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 
 const SignIn = () => {
   const [formdata, setFormData] = useState({});
- 
-  const navigate = useNavigate();
-  const dispatch = useDispatch()
 
-  const {loading : isLoading, error : errMessage} = useSelector(state=>state.user)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { loading: isLoading, error: errMessage } = useSelector(
+    (state) => state.user
+  );
 
   console.log(formdata);
   const handleOnChange = (e) => {
@@ -22,12 +28,12 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if ( !formdata.password || !formdata.email) {
+    if (!formdata.password || !formdata.email) {
       return dispatch(signInFailure("Please fill out the fields"));
     }
 
     try {
-     dispatch(signInStart())
+      dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
@@ -39,18 +45,15 @@ const SignIn = () => {
       const data = await res.json();
 
       if (data.success === false) {
-        
         dispatch(signInFailure(data.message));
       }
 
       if (res.ok) {
-        dispatch(signInSuccess(data))
+        dispatch(signInSuccess(data.rest));
         navigate("/");
       }
-
-      
     } catch (error) {
-     dispatch(signInFailure(error.message))
+      dispatch(signInFailure(error.message));
     }
   };
   return (
