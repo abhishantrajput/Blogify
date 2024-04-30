@@ -2,11 +2,16 @@ import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { FaMoon, FaSun } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import { themeToggle } from "../redux/theme/themeSlice";
 
 const Header = () => {
   const path = useLocation().pathname;
+
+  const dispatch = useDispatch();
+
+  const { theme } = useSelector((state) => state.theme);
 
   const { currentUser } = useSelector((state) => state.user);
   return (
@@ -14,7 +19,7 @@ const Header = () => {
     <Navbar className="border-b-2">
       <Link
         to={"/"}
-        className="self-center text-sm sm:text-xl font-semibold dark:white "
+        className="self-center text-sm sm:text-xl font-semibold dark:white"
       >
         <span className="px-3 py-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
           Blogify
@@ -35,8 +40,15 @@ const Header = () => {
       </Button>
 
       <div className="flex gap-2 md:order-2">
-        <Button className="w-12 h-10 hidden sm:inline" color={"gray"} pill>
-          <FaMoon />
+        <Button
+          className="w-12 h-10 hidden sm:inline"
+          color={"gray"}
+          pill
+          outline
+          
+          onClick={() => dispatch(themeToggle())}
+        >
+          {theme==="light"?<FaMoon/>:<FaSun/>}
         </Button>
 
         {currentUser ? (
@@ -56,11 +68,9 @@ const Header = () => {
               <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
 
-            <Dropdown.Divider/>
+            <Dropdown.Divider />
 
-            <Dropdown.Item>
-              logout
-            </Dropdown.Item>
+            <Dropdown.Item>logout</Dropdown.Item>
           </Dropdown>
         ) : (
           <Link to={"/signin"}>
