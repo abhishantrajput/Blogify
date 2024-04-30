@@ -88,7 +88,7 @@ export const login = async (req, res, next) => {
 };
 
 export const googleAuth = async (req, res, next) => {
-  const { name, email, googlePhotoURL } = req.body;
+  const { displayName:name, email, googlePhotoURL } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -114,7 +114,8 @@ export const googleAuth = async (req, res, next) => {
           .split("")
           .map((char) => (char.match(/[a-z0-9]/) ? char : ""))
           .join("")
-          .slice(0, 3) + Math.random().toString(36).slice(-3);
+          .slice(0, 9
+          ) + Math.random().toString(36).slice(-3);
 
       const newUser = new User({
         email,
