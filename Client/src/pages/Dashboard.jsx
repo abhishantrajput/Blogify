@@ -1,9 +1,43 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
+
+import { useLocation } from "react-router-dom";
+import ProfileDashboard from "../components/ProfileDashboard";
+import LeftSidebar from "../components/LeftSidebar";
 
 const Dashboard = () => {
-  return (
-    <div>Dashboard</div>
-  )
-}
+  const location = useLocation();
 
-export default Dashboard
+  const [tab, setTab] = useState("");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const tabFormURL = urlParams.get("tab");
+
+    if (tabFormURL) {
+      setTab(tabFormURL);
+    }
+
+    console.log(tabFormURL);
+  }, [location.search]);
+
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Left Sidebar Start */}
+
+      <div className="md:w-56">
+        {" "}
+        <LeftSidebar />{" "}
+      </div>
+
+      {/* Left Sidebar Close */}
+
+      {/* Profile Dashboard Start */}
+
+      <div>{tab === "profile" && <ProfileDashboard />}</div>
+
+      {/* Profile Dashboard End */}
+    </div>
+  );
+};
+
+export default Dashboard;
