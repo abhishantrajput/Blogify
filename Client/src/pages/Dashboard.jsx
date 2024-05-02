@@ -33,7 +33,7 @@ const Dashboard = () => {
 
       {/* Profile Dashboard Start */}
 
-      <div>{tab === "profile" && <ProfileDashboard />}</div>
+      {tab === "profile" && <ProfileDashboard />}
 
       {/* Profile Dashboard End */}
     </div>
