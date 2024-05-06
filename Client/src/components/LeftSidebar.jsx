@@ -33,6 +33,7 @@ const LeftSidebar = () => {
               label={"User"}
               labelColor="dark"
               className="cursor-pointer"
+              as= "div"
             >
               Profie
             </Sidebar.Item>
