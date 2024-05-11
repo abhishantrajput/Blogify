@@ -128,6 +128,7 @@ const ProfileDashboard = () => {
               imageFileUploadProgress < 100 &&
               "opacity-60"
             }`}
+            id="photoURL"
             src={imageFileURL ? imageFileURL : currentUser.photoURL}
             alt="Profile Img"
           />
