@@ -25,9 +25,40 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
+
+    updateStart: (state) => {
+      state.loading = true;
+
+      state.error = null;
+    },
+
+    updateSuccess: (state, action) => {
+      state.currentUser = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+
+    updateFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    updateImageProfileURL: (state, action) => {
+      if (state.currentUser) {
+        state.currentUser.photoURL = action.payload;
+      }
+    },
   },
 });
 
-export const { signInStart, signInFailure, signInSuccess } = userSlice.actions;
+export const {
+  signInStart,
+  signInFailure,
+  signInSuccess,
+  updateFailure,
+  updateStart,
+  updateSuccess,
+  updateImageProfileURL,
+} = userSlice.actions;
 
 export default userSlice.reducer;

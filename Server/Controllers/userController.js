@@ -58,7 +58,7 @@ export const userUpdate = async (req, res, next) => {
 
     const { password: pass, ...rest } = updatedUser._doc;
 
-    res.send("User updated successfully");
+    return res.status(200).json(rest);
   } catch (error) {
     console.error("Error updating user:", error);
     return next(errorHandler(500, "Internal Server Error"));

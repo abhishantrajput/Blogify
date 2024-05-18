@@ -3,6 +3,14 @@ import { useSelector } from "react-redux";
 
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import {
+  updateFailure,
+  updateStart,
+  updateSuccess,
+  updateImageProfileURL,
+} from "../redux/user/userSlice.js";
+
+import { useDispatch } from "react-redux";
 
 import {
   getStorage,
@@ -13,14 +21,19 @@ import {
 import { app } from "../../firebase.js";
 
 import { TextInput, Button, Alert } from "flowbite-react";
-import { root } from "postcss";
 const ProfileDashboard = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [imageFileURL, setImageFileURL] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
+  const [imageFileUploadingProcess, setImageFileUploadingProcess] =
+    useState(false);
 
-  console.log(imageFileUploadProgress, imageFileUploadError);
+  const [userUpdateText, setUserUpdateText] = useState(null);
+  const [userUpdateFailText, setUserUpdateFailText] = useState(null);
+  const [formData, setFormData] = useState({});
+
+  const dispatch = useDispatch();
 
   const { currentUser } = useSelector((state) => state.user);
 
@@ -55,9 +68,10 @@ const ProfileDashboard = () => {
     //   }
     // }
 
+    setImageFileUploadingProcess(true);
     setImageFileUploadError(null);
-    setImageFileURL(null)
-    setProfileImage(null)
+    setImageFileURL(null);
+    setProfileImage(null);
 
     const storage = getStorage(app);
 
@@ -77,20 +91,83 @@ const ProfileDashboard = () => {
         setImageFileUploadError(
           "Could not upload image (File must be less than 2MB)"
         );
+        setImageFileUploadProgress(null);
+        setImageFileURL(null);
+        setProfileImage(null);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageFileURL(downloadURL);
+          setFormData({ ...formData, photoURL: downloadURL });
+          setImageFileUploadingProcess(false);
         });
       }
     );
   };
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  console.log(formData);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setUserUpdateFailText(null);
+    setUserUpdateText(null);
+
+    if (imageFileUploadingProcess) {
+      setUserUpdateFailText("User Already being updating...");
+      return;
+    }
+
+    if (Object.keys(formData).length === 0) {
+      setUserUpdateFailText("Enter Infromation to change");
+      return;
+    }
+
+    try {
+      const updatedFormData = { ...formData };
+      if (imageFileURL) {
+        updatedFormData.photoURL = imageFileURL;
+      }
+      dispatch(updateStart());
+
+      const res = await fetch(`/api/users/update/${currentUser._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedFormData),
+      });
+
+      if (imageFileURL) {
+        dispatch(updateImageProfileURL(imageFileURL));
+      }
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        dispatch(updateFailure(data.message));
+        setUserUpdateFailText(data.message);
+      } else {
+        dispatch(updateSuccess(data));
+        setUserUpdateText("User's Profile Updated Successfully!!");
+      }
+    } catch (error) {
+      dispatch(updateFailure(error.message));
+      setUserUpdateFailText(error.message);
+    }
+  };
+
+  console.log("FromData", formData);
+
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
-      <h1 className="my-7 text-3xl font-semibold text-center  ">Profile</h1>
+      <h1 className="my-7 text-3xl font-semibold text-center">Profile</h1>
 
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="file"
           accept="image/*"
@@ -129,29 +206,33 @@ const ProfileDashboard = () => {
               "opacity-60"
             }`}
             id="photoURL"
-            src={imageFileURL ? imageFileURL : currentUser.photoURL}
+            src={imageFileURL ? imageFileURL : currentUser?.photoURL}
             alt="Profile Img"
           />
         </div>
-
         {imageFileUploadError && (
           <Alert color={"failure"}>{imageFileUploadError}</Alert>
         )}
-
         <TextInput
           type="text"
           id="username"
           placeholder="username"
-          defaultValue={currentUser.username}
+          defaultValue={currentUser?.username}
+          onChange={handleChange}
         />
         <TextInput
           type="email"
           id="email"
           placeholder="email"
-          defaultValue={currentUser.email}
+          defaultValue={currentUser?.email}
+          onChange={handleChange}
         />
-        <TextInput type="password" id="password" placeholder="**********" />
-
+        <TextInput
+          type="password"
+          id="password"
+          placeholder="**********"
+          onChange={handleChange}
+        />{" "}
         <Button
           type="submit"
           gradientDuoTone={"purpleToBlue"}
@@ -165,6 +246,24 @@ const ProfileDashboard = () => {
       <div className="text-red-500 mt-4 font-medium flex justify-between">
         <span className="cursor-pointer">Delete Account</span>
         <span className="cursor-pointer">Sign Out</span>
+      </div>
+
+      <div>
+        {userUpdateText && (
+          <Alert color={"success"} className="mt-4">
+            <p className="text-[15px] tracking-widest font-medium text-[dark-green]">
+              {userUpdateText}
+            </p>
+          </Alert>
+        )}
+
+        {userUpdateFailText && (
+          <Alert color={"failure"} className="mt-4">
+            <p className="text-[15px] tracking-widest font-medium text-[dark-green]">
+              {userUpdateFailText}
+            </p>
+          </Alert>
+        )}
       </div>
     </div>
   );
