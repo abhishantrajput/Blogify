@@ -8,7 +8,9 @@ export const userUpdate = async (req, res, next) => {
   console.log("User Object Id ", req.user.id, "Params id ", req.params.userId);
 
   if (req.user.id !== req.params.userId) {
-    return next(errorHandler(403, "You are not allowed to update this user's information"));
+    return next(
+      errorHandler(403, "You are not allowed to update this user's information")
+    );
   }
 
   if (password && password.length < 8) {
@@ -17,7 +19,9 @@ export const userUpdate = async (req, res, next) => {
 
   if (username) {
     if (username.length < 7 || username.length > 22) {
-      return next(errorHandler(400, "Username must be between 7 to 22 characters"));
+      return next(
+        errorHandler(400, "Username must be between 7 to 22 characters")
+      );
     }
 
     if (username.includes(" ")) {
@@ -62,5 +66,21 @@ export const userUpdate = async (req, res, next) => {
   } catch (error) {
     console.error("Error updating user:", error);
     return next(errorHandler(500, "Internal Server Error"));
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.userId) {
+    next(
+      errorHandler(403, "You are not authorized to Apply changes to this user")
+    );
+  }
+
+  try {
+    await User.findByIdAndDelete(req.user.id);
+
+    return res.status(200).json("User has been deleted");
+  } catch (error) {
+    next(error);
   }
 };
