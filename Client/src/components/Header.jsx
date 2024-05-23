@@ -6,6 +6,8 @@ import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { themeToggle } from "../redux/theme/themeSlice";
 
+import {userSignOutSuccess} from "../redux/user/userSlice.js"
+
 const Header = () => {
   const path = useLocation().pathname;
 
@@ -14,6 +16,24 @@ const Header = () => {
   const { theme } = useSelector((state) => state.theme);
 
   const { currentUser } = useSelector((state) => state.user);
+
+  const handleUserSignOut = async () => {
+    try {
+      const res = await fetch("/api/users/signout", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        dispatch(userSignOutSuccess());
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   return (
     // Navbar is one of Component of the Flow-bite React
     <Navbar className="border-b-2">
@@ -70,7 +90,7 @@ const Header = () => {
 
             <Dropdown.Divider />
 
-            <Dropdown.Item>logout</Dropdown.Item>
+            <Dropdown.Item onClick={handleUserSignOut}>logout</Dropdown.Item>
           </Dropdown>
         ) : (
           <Link to={"/signin"}>
