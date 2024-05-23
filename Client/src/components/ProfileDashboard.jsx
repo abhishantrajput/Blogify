@@ -8,6 +8,9 @@ import {
   updateStart,
   updateSuccess,
   updateImageProfileURL,
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
 } from "../redux/user/userSlice.js";
 
 import { useDispatch } from "react-redux";
@@ -20,7 +23,8 @@ import {
 } from "firebase/storage";
 import { app } from "../../firebase.js";
 
-import { TextInput, Button, Alert } from "flowbite-react";
+import { TextInput, Button, Alert, Modal } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 const ProfileDashboard = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [imageFileURL, setImageFileURL] = useState(null);
@@ -32,6 +36,8 @@ const ProfileDashboard = () => {
   const [userUpdateText, setUserUpdateText] = useState(null);
   const [userUpdateFailText, setUserUpdateFailText] = useState(null);
   const [formData, setFormData] = useState({});
+
+  const [showModel, setShowModel] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -163,6 +169,26 @@ const ProfileDashboard = () => {
 
   console.log("FromData", formData);
 
+  const handleDeleteUser = async () => {
+    setShowModel(false);
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/users/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        dispatch(deleteUserFailure(data.message));
+      } else {
+        dispatch(deleteUserSuccess());
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
+
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-3xl font-semibold text-center">Profile</h1>
@@ -244,7 +270,9 @@ const ProfileDashboard = () => {
       </form>
 
       <div className="text-red-500 mt-4 font-medium flex justify-between">
-        <span className="cursor-pointer">Delete Account</span>
+        <span onClick={() => setShowModel(true)} className="cursor-pointer">
+          Delete Account
+        </span>
         <span className="cursor-pointer">Sign Out</span>
       </div>
 
@@ -265,6 +293,33 @@ const ProfileDashboard = () => {
           </Alert>
         )}
       </div>
+
+      <Modal
+        show={showModel}
+        onClose={() => setShowModel(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="text-lg text-gray-500 dark:text-gray-400">
+              Are you sure want to delete your Account?
+            </h3>
+
+            <div className="flex gap-2 justify-center mt-4">
+              <Button color={"failure"} onClick={handleDeleteUser}>
+                Delete it.
+              </Button>
+              <Button color={"success"} onClick={() => setShowModel(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

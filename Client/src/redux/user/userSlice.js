@@ -48,6 +48,23 @@ const userSlice = createSlice({
         state.currentUser.photoURL = action.payload;
       }
     },
+
+    deleteUserStart : (state)=>{
+      state.loading = true;
+      state.error = null;
+    },
+
+    deleteUserSuccess : (state, action)=>{
+
+      state.currentUser = null;
+      state.error = null;
+      state.loading = false;
+    },
+    deleteUserFailure:(state, action)=>{
+      state.error = action.payload;
+      state.loading = false;
+      
+    }
   },
 });
 
@@ -59,6 +76,9 @@ export const {
   updateStart,
   updateSuccess,
   updateImageProfileURL,
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess
 } = userSlice.actions;
 
 export default userSlice.reducer;
