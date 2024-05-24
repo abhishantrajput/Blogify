@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema(
       default:
         "https://ps.w.org/user-avatar-reloaded/assets/icon-256x256.png?rev=2540745",
     },
+
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
