@@ -6,7 +6,9 @@ import SignIn from "../pages/SignIn.jsx";
 import SignUp from "../pages/SignUp.jsx";
 import About from "../pages/About.jsx";
 import Projects from "../pages/Projects.jsx";
+import OnlyAdminPrivateRoute from "./OnlyAdminPrivateRoute.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
+import CreatePost from "../pages/CreatePost.jsx";
 const Router = () => {
   return (
     <Routes>
@@ -15,7 +17,11 @@ const Router = () => {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/about" element={<About />} />
       <Route element={<PrivateRoute />}>
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Route>
+
+      <Route element={<OnlyAdminPrivateRoute />}>
+        <Route path="/create-post" element={<CreatePost />} />
       </Route>
       <Route path="/projects" element={<Projects />} />
     </Routes>

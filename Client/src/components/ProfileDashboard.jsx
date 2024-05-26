@@ -26,6 +26,7 @@ import { app } from "../../firebase.js";
 
 import { TextInput, Button, Alert, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { Link } from "react-router-dom";
 const ProfileDashboard = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [imageFileURL, setImageFileURL] = useState(null);
@@ -42,7 +43,7 @@ const ProfileDashboard = () => {
 
   const dispatch = useDispatch();
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
 
   const filePickerRef = useRef();
   // console.log(currentUser);
@@ -283,16 +284,29 @@ const ProfileDashboard = () => {
           gradientDuoTone={"purpleToBlue"}
           outline
           className="medium tracking-widest"
+          disabled={loading || imageFileUploadingProcess}
         >
-          Update
+          {loading ? "Loading..." : "Update"}
         </Button>
+        {currentUser?.isAdmin && (
+          <Link to="/create-post">
+            <Button
+              gradientDuoTone="purpleToPink"
+              className="w-full tracking-widest"
+            >
+              Create a Post
+            </Button>
+          </Link>
+        )}
       </form>
 
       <div className="text-red-500 mt-4 font-medium flex justify-between">
         <span onClick={() => setShowModel(true)} className="cursor-pointer">
           Delete Account
         </span>
-        <span className="cursor-pointer" onClick={handleUserSignOut}>Sign Out</span>
+        <span className="cursor-pointer" onClick={handleUserSignOut}>
+          Sign Out
+        </span>
       </div>
 
       <div>
