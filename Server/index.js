@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import { Database_Connection } from "./Database/Connection.js";
 import userRoute from "./Routes/userRoute.js";
 import authRoute from "./Routes/authRoute.js";
-import cookieParser from "cookie-parser"
+import postRoute from "./Routes/postRoute.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -15,17 +16,17 @@ dotenv.config();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser())
+app.use(cookieParser());
 
 // Routes
 
 app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/post", postRoute);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
-
 
   return res.status(statusCode).json({
     success: false,
