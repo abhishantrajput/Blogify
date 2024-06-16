@@ -17,22 +17,6 @@ export const Register = async (req, res, next) => {
       return next(errorHandler(400, "All fields are Required"));
     }
 
-    // const user1 = await User.find({ email });
-
-    // const exitstedUsername = await User.find({ username });
-
-    // if (exitstedUsername?.length > 0) {
-    //   return res.status(400).json({
-    //     message: "username  not Available",
-    //   });
-    // }
-
-    // if (user1?.length > 0) {
-    //   return res.status(400).json({
-    //     message: "Email already Exists",
-    //   });
-    // }
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -88,7 +72,7 @@ export const login = async (req, res, next) => {
 };
 
 export const googleAuth = async (req, res, next) => {
-  const { displayName:name, email, googlePhotoURL } = req.body;
+  const { displayName: name, email, googlePhotoURL } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -114,8 +98,7 @@ export const googleAuth = async (req, res, next) => {
           .split("")
           .map((char) => (char.match(/[a-z0-9]/) ? char : ""))
           .join("")
-          .slice(0, 9
-          ) + Math.random().toString(36).slice(-3);
+          .slice(0, 9) + Math.random().toString(36).slice(-3);
 
       const newUser = new User({
         email,
