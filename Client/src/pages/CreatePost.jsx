@@ -162,7 +162,7 @@ const CreatePost = () => {
             <option value="uncategorized"> Select the Category</option>
             <option value="javascript">Javascript</option>
             <option value="python">Python</option>
-            <option value="machinelearning">Machine Learing</option>
+            <option value="machine learning">Machine Learing</option>
             <option value="ai">AI</option>
             <option value="ds">Data Structure</option>
           </Select>

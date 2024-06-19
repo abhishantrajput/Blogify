@@ -33,7 +33,7 @@ const postSchema = new mongoose.Schema({
 
         type: String,
 
-        default : "https://www.google.com/url?sa=i&url=https%3A%2F%2Fvenngage.com%2Fblog%2Fblogging-tips%2F&psig=AOvVaw2ihuHLdxRSiA2HGUS4LbZf&ust=1718308309677000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCNirvrLr1oYDFQAAAAAdAAAAABAI"
+        default : "https://www.hostinger.com/tutorials/wp-content/uploads/sites/2/2021/09/how-to-write-a-blog-post.png"
     },
 
     category : {
