@@ -1,4 +1,5 @@
 import {
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -15,6 +16,8 @@ import { Link } from "react-router-dom";
 const Posts = () => {
   const [userPosts, setUserPosts] = useState([]);
 
+  const [showPosts, setShowPosts] = useState(true);
+
   const { currentUser } = useSelector((state) => state.user);
 
   console.log(userPosts);
@@ -25,6 +28,10 @@ const Posts = () => {
         const res = await fetch(`/api/post/getposts?userId=${currentUser._id}`);
 
         const data = await res.json();
+
+        if (data.posts.length < 9) {
+          setShowPosts(false);
+        }
 
         if (res.ok) {
           setUserPosts(data.posts);
@@ -38,8 +45,35 @@ const Posts = () => {
     }
   }, [currentUser._id]);
 
+  const handleShowMore = async () => {
+    try {
+      const startIndex = userPosts.length;
+
+      const res = await fetch(
+        `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
+      );
+
+      const data = await res.json();
+
+      console.log("Data Posts", data.posts);
+
+      console.log(res.ok);
+
+      if (res.ok) {
+        setUserPosts((prev) => [...prev, ...data.posts]);
+      }
+      if (data.posts.length < 9) {
+        setShowPosts(false);
+      }
+
+      console.log(userPosts);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
-    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
+    <div className="min-h-screen table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
       {currentUser.isAdmin && userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
@@ -96,6 +130,15 @@ const Posts = () => {
               ))}
             </Table.Body>
           </Table>
+
+          {showPosts && (
+            <button
+              onClick={handleShowMore}
+              className="w-full mx-auto mt-2 text-teal-500 font-bold hover:text-teal-300"
+            >
+              Show More...
+            </button>
+          )}
         </>
       ) : (
         <p> You don't have the posts </p>
