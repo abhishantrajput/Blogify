@@ -4,9 +4,7 @@ import { errorHandler } from "../utils/error.js";
 export const createPost = async (req, res, next) => {
   console.log(req.body);
 
-  const {title,image,category} = req.body;
-
-
+  const { title, image, category } = req.body;
 
   if (!req.user.isAdmin) {
     return next(errorHandler(403, "You're not Allowed to Create Post"));
@@ -24,11 +22,16 @@ export const createPost = async (req, res, next) => {
     .toLowerCase()
     .replace(/[^a-zA-Z0-9-]/g, "-");
 
-    const titleExit = await Post.findOne({title})
-    console.log(titleExit)
+  const titleExit = await Post.findOne({ title });
+  console.log(titleExit);
 
   if (titleExit) {
-    return next(errorHandler(400,"Title already Existed!! . please select the another Title "));
+    return next(
+      errorHandler(
+        400,
+        "Title already Existed!! . please select the another Title "
+      )
+    );
   }
 
   const newPost = new Post({
@@ -38,7 +41,6 @@ export const createPost = async (req, res, next) => {
     slug,
     image,
     category,
-    
 
     userId: req.user.id,
   });
@@ -52,15 +54,11 @@ export const createPost = async (req, res, next) => {
   }
 };
 
-
-
-
-
 export const getposts = async (req, res, next) => {
   try {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
-    const sortDirection = req.query.order === 'asc' ? 1 : -1;
+    const sortDirection = req.query.order === "asc" ? 1 : -1;
     const posts = await Post.find({
       ...(req.query.userId && { userId: req.query.userId }),
       ...(req.query.category && { category: req.query.category }),
@@ -68,8 +66,8 @@ export const getposts = async (req, res, next) => {
       ...(req.query.postId && { _id: req.query.postId }),
       ...(req.query.searchTerm && {
         $or: [
-          { title: { $regex: req.query.searchTerm, $options: 'i' } },
-          { content: { $regex: req.query.searchTerm, $options: 'i' } },
+          { title: { $regex: req.query.searchTerm, $options: "i" } },
+          { content: { $regex: req.query.searchTerm, $options: "i" } },
         ],
       }),
     })
@@ -96,6 +94,20 @@ export const getposts = async (req, res, next) => {
       totalPosts,
       lastMonthPosts,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deletePost = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(errorHandler(403, "You're Not Allowed to Delete this Post"));
+  }
+
+  try {
+    await Post.findByIdAndDelete(req.params.postId);
+
+    return res.status(200).json("The Post has been Deleted");
   } catch (error) {
     next(error);
   }

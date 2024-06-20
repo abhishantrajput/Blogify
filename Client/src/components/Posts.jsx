@@ -5,11 +5,13 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Modal,
+  ListGroup,
 } from "flowbite-react";
 import React from "react";
 
 import { useState, useEffect } from "react";
-
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -17,6 +19,10 @@ const Posts = () => {
   const [userPosts, setUserPosts] = useState([]);
 
   const [showPosts, setShowPosts] = useState(true);
+
+  const [showModel, setShowModel] = useState(false);
+
+  const [postIdToDelete, setPostIdToDelete] = useState(null);
 
   const { currentUser } = useSelector((state) => state.user);
 
@@ -72,6 +78,30 @@ const Posts = () => {
     }
   };
 
+  const handleDeletePost = async () => {
+    console.log("Handle Delete Post Clicked!!");
+    try {
+      setShowModel(false);
+      const res = await fetch(
+        `/api/post/deletepost/${currentUser._id}/${postIdToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        setUserPosts((prev) =>
+          prev.filter((post) => post._id !== postIdToDelete)
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="min-h-screen table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
       {currentUser.isAdmin && userPosts.length > 0 ? (
@@ -114,7 +144,13 @@ const Posts = () => {
                   <Table.Cell>{post.category}</Table.Cell>
 
                   <Table.Cell>
-                    <span className="text-red-800 font-medium hover:underline cursor-pointer">
+                    <span
+                      onClick={() => {
+                        setShowModel(true);
+                        setPostIdToDelete(post._id);
+                      }}
+                      className="text-red-800 font-medium hover:underline cursor-pointer"
+                    >
                       Delete
                     </span>
                   </Table.Cell>
@@ -143,6 +179,33 @@ const Posts = () => {
       ) : (
         <p> You don't have the posts </p>
       )}
+
+      <Modal
+        show={showModel}
+        onClose={() => setShowModel(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="text-lg text-gray-500 dark:text-gray-400">
+              Are you sure want to delete your Post?
+            </h3>
+
+            <div className="flex gap-2 justify-center mt-4">
+              <Button color={"failure"} onClick={handleDeletePost}>
+                Delete it.
+              </Button>
+              <Button color={"success"} onClick={() => setShowModel(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
