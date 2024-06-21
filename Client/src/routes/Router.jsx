@@ -9,6 +9,7 @@ import Projects from "../pages/Projects.jsx";
 import OnlyAdminPrivateRoute from "./OnlyAdminPrivateRoute.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
 import CreatePost from "../pages/CreatePost.jsx";
+import UpdatePost from "../pages/UpdatePost.jsx";
 const Router = () => {
   return (
     <Routes>
@@ -22,6 +23,7 @@ const Router = () => {
 
       <Route element={<OnlyAdminPrivateRoute />}>
         <Route path="/create-post" element={<CreatePost />} />
+        <Route path="/update-post/:postId" element={<UpdatePost/>} />
       </Route>
       <Route path="/projects" element={<Projects />} />
     </Routes>
