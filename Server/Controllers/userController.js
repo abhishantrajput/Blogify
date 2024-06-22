@@ -70,10 +70,8 @@ export const userUpdate = async (req, res, next) => {
 };
 
 export const deleteUser = async (req, res, next) => {
-  if (req.user.id !== req.params.userId) {
-    next(
-      errorHandler(403, "You are not authorized to Apply changes to this user")
-    );
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+    next(errorHandler(403, "You are not authorized to Delete to this user"));
   }
 
   try {
@@ -93,7 +91,7 @@ export const signOut = (req, res, next) => {
   }
 };
 
-export const getUsers = async (req, res,next) => {
+export const getUsers = async (req, res, next) => {
   if (!req.user.isAdmin) {
     return next(errorHandler(403, "You are Not Allowed to See the Users"));
   }
@@ -106,49 +104,37 @@ export const getUsers = async (req, res,next) => {
     const sortDirection = req.query.sort === "asc" ? 1 : -1;
 
     const users = await User.find()
-      .sort({createdAt: sortDirection})
+      .sort({ createdAt: sortDirection })
       .skip(startIndex)
       .limit(limit);
 
+    const usersWithoutPassword = users.map((user) => {
+      const { password, ...rest } = user._doc;
 
+      return rest;
+    });
 
-      const usersWithoutPassword = users.map((user)=>{
+    const totalUsers = await User.countDocuments();
 
-        const{password, ...rest} = user._doc;
-        
-        return rest;
-      })
+    const now = new Date();
 
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
 
-      const totalUsers = await User.countDocuments();
+    const lastMonthsUsers = await User.countDocuments({
+      createdAt: {
+        $gte: oneMonthAgo,
+      },
+    });
 
-
-      const now = new Date();
-
-
-      const oneMonthAgo = new Date(
-        now.getFullYear(),
-        now.getMonth() - 1,
-        now.getDate()
-      )
-
-      const lastMonthsUsers = await User.countDocuments({
-        createdAt : {
-          $gte : oneMonthAgo
-        }
-      })
-
-
-
-
-      return res.status(200).json(
-        {
-          users : usersWithoutPassword,
-          totalUsers,
-          lastMonthsUsers,
-
-        }
-      )
+    return res.status(200).json({
+      users: usersWithoutPassword,
+      totalUsers,
+      lastMonthsUsers,
+    });
   } catch (error) {
     next(error);
   }

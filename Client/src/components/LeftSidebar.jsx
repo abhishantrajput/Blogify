@@ -2,7 +2,7 @@ import React from "react";
 
 import { Sidebar } from "flowbite-react";
 
-import { HiUser, HiArrowSmRight, HiDocumentText } from "react-icons/hi";
+import { HiUser, HiArrowSmRight, HiDocumentText,HiOutlineUserGroup } from "react-icons/hi";
 
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -75,6 +75,18 @@ const LeftSidebar = () => {
                 as="div"
               >
                 Posts
+              </Sidebar.Item>
+            </Link>
+          )}
+          {currentUser.isAdmin && (
+            <Link to={"/dashboard?tab=users"}>
+              <Sidebar.Item
+                icon={HiOutlineUserGroup}
+                labelColor="dark"
+                className="cursor-pointer"
+                as="div"
+              >
+                Users
               </Sidebar.Item>
             </Link>
           )}
